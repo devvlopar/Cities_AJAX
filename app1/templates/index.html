@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<style>
+input[type=text], select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+input[type=submit], button {
+  width: 100%;
+  background-color: #4CAF50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+div {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
+}
+
+
+#customers {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#customers td, #customers th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#customers tr:nth-child(even){background-color: #f2f2f2;}
+
+#customers tr:hover {background-color: #ddd;}
+
+#customers th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #04AA6D;
+  color: white;
+}
+
+
+</style>
+<body>
+
+<h3>Using CSS to style an HTML Form</h3>
+
+<div>
+  <form action="">
+    {% csrf_token %}
+    <label for="fname">First Name</label>
+    <input type="text" id="fname" name="firstname" placeholder="Your name..">
+
+    <label for="lname">Last Name</label>
+    <input type="text" id="lname" name="lastname" placeholder="Your last name..">
+
+    <label for="country">Country</label>
+    <select id="country" name="country">
+        {% for i in all_countries %}
+      <option value="{{i.country_name}}" onclick="get_cities({{i.id}})">{{i.country_name}}</option>
+        {% endfor %}
+    </select>
+
+    <label for="city">City</label>
+    <select id="city" name="city" >
+      <option value="select" disabled>--select--</option>
+      
+      
+    </select>
+  
+    <button type="button" onclick="row_create()" value="Submit"> Submit</button>
+  </form>
+</div>
+
+
+<h1>A Fancy Table</h1>
+
+<table id="customers">
+<thead>
+  <tr>
+    <th>First Name</th>
+    <th>Last Name</th>
+    <th>City</th>
+    <th>Country</th>
+  </tr>
+</thead>
+
+  <tbody id="tbody">
+  {% for i in all_data %}
+  <tr>
+    <td>{{i.first_name}}</td>
+    <td>{{i.last_name}}</td>
+    <td>{{i.city.city_name}}</td>
+    <td>{{i.city.country.country_name}}</td>
+  </tr>
+{% endfor %}
+</tbody>
+
+
+ 
+</table>
+<br><br><br>
+
+
+
+<!-- faaltu language code started -->
+
+<script>
+    function get_cities(cid){
+        d1 = {
+            country_id : cid
+        }
+        $.ajax({
+            url : '/get_cities/',
+            method : 'GET',
+            data : d1,
+            success : function(response){
+                    l1 = response.all_cities
+                    s = ""
+                    for(let i=0; i < l1.length; i++){
+                        
+                        s += `<option value='${l1[i].city_name}'> ${l1[i].city_name} </option>`
+
+                    }
+                    $("#city").html(s)
+            }
+        })
+    }
+
+
+    function row_create(){
+        let d1 = {
+            first_name : $("#fname").val(),
+            last_name : $("#lname").val(),
+            country : $("#country").val(),
+            city : $("#city").val(),
+            csrfmiddlewaretoken : $('input[name="csrfmiddlewaretoken"]').val()
+        }
+        $.ajax({
+            data : d1,
+            url : '/row_create/',
+            method : 'POST',
+            success : function(response){
+                u_d = response.updated_data
+                s2 = ''
+                for(let j =0; j < u_d.length; j ++){
+                    s2 += `<tr>
+                                <td>${u_d[j].first_name}</td>
+                                <td>${u_d[j].last_name}</td>
+                                <td>${u_d[j].city_name}</td>
+                                <td>${u_d[j].country_name}</td>
+                            </tr>`
+                }
+                $("#tbody").html(s2)
+            }
+
+        })
+    }
+</script>
+</body>
+</html>
+
+
