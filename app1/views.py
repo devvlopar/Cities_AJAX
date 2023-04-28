@@ -16,7 +16,7 @@ def get_cities(request):
 
 
 def row_create(request):
-    co_obj = Countries.objects.get(country_name = request.POST['country'])
+    co_obj = Countries.objects.get(id = request.POST['country'])
     User.objects.create(
         first_name = request.POST['first_name'],
         last_name = request.POST['last_name'],
@@ -36,3 +36,19 @@ def row_create(request):
  {'id': 4, 'first_name': 'Avinash', 'last_name': 'Patil', 'city_id': 8}, 
  {'id': 5, 'first_name': 'Avi', 'last_name': 'Pa', 'city_id': 7}]
 """
+
+
+def del_user(request):
+    
+    user_obj = User.objects.get(id = request.GET['uid'])
+    user_obj.delete()
+
+    #sends the all users data AFTER UPDATE IN TABLE
+    all_data = list(User.objects.all().values())
+    for idx in range(len(all_data)):
+        
+        ci_obj = Cities.objects.get(id = all_data[idx]['city_id'])
+        all_data[idx]['city_name'] = ci_obj.city_name
+        all_data[idx]['country_name'] = ci_obj.country.country_name
+
+    return JsonResponse({'updated_data': all_data})

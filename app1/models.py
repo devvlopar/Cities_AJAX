@@ -20,6 +20,7 @@ class User(models.Model):
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     city = models.ForeignKey(Cities, on_delete=models.CASCADE)
+    pic = models.FileField(upload_to='profile_pics', default='sad.jpg')
     
     def __str__(self) -> str:
         return self.first_name

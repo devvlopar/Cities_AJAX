@@ -17,10 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from app1.views import *
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index),
     path('get_cities/', get_cities),
-    path('row_create/', row_create)
-]
+    path('row_create/', row_create),
+    path('del_user/', del_user)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

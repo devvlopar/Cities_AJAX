@@ -60,6 +60,28 @@ div {
 
 </style>
 <body>
+  <script>
+        function get_cities(cid){
+        d1 = {
+            country_id : cid
+        }
+        $.ajax({
+            url : '/get_cities/',
+            method : 'GET',
+            data : d1,
+            success : function(response){
+                    l1 = response.all_cities
+                    s = ""
+                    for(let i=0; i < l1.length; i++){
+                        
+                        s += `<option value='${l1[i].city_name}'> ${l1[i].city_name} </option>`
+
+                    }
+                    $("#city").html(s)
+            }
+        })
+    }
+  </script>
 
 <h3>Using CSS to style an HTML Form</h3>
 
@@ -75,7 +97,7 @@ div {
     <label for="country">Country</label>
     <select id="country" name="country">
         {% for i in all_countries %}
-      <option value="{{i.country_name}}" onclick="get_cities({{i.id}})">{{i.country_name}}</option>
+      <option value="{{i.id}}" >{{i.country_name}}</option>
         {% endfor %}
     </select>
 
@@ -100,6 +122,8 @@ div {
     <th>Last Name</th>
     <th>City</th>
     <th>Country</th>
+    <th>Action</th>
+
   </tr>
 </thead>
 
@@ -110,6 +134,7 @@ div {
     <td>{{i.last_name}}</td>
     <td>{{i.city.city_name}}</td>
     <td>{{i.city.country.country_name}}</td>
+    <td><button onclick="del_user({{i.id}})" >Delete</button></td>
   </tr>
 {% endfor %}
 </tbody>
@@ -124,9 +149,9 @@ div {
 <!-- faaltu language code started -->
 
 <script>
-    function get_cities(cid){
+  $('#country').on('change', function(){
         d1 = {
-            country_id : cid
+            country_id : $(this).val()
         }
         $.ajax({
             url : '/get_cities/',
@@ -140,10 +165,10 @@ div {
                         s += `<option value='${l1[i].city_name}'> ${l1[i].city_name} </option>`
 
                     }
-                    $("#city").html(s)
+                    $("#city").html(s);
             }
         })
-    }
+    })
 
 
     function row_create(){
@@ -167,6 +192,7 @@ div {
                                 <td>${u_d[j].last_name}</td>
                                 <td>${u_d[j].city_name}</td>
                                 <td>${u_d[j].country_name}</td>
+                                <td><button onclick="del_user(${u_d[j].id})" >Delete</button></td>
                             </tr>`
                 }
                 $("#tbody").html(s2)
@@ -175,6 +201,34 @@ div {
         })
     }
 </script>
+
+<script>
+  function del_user(pk){
+    let d1 = {
+      uid : pk
+    }
+    $.ajax({
+      url : '/del_user/',
+      data : d1,
+      method : 'GET',
+      success : function(response){
+        u_d = response.updated_data
+                s2 = ''
+                for(let j =0; j < u_d.length; j ++){
+                    s2 += `<tr>
+                                <td>${u_d[j].first_name}</td>
+                                <td>${u_d[j].last_name}</td>
+                                <td>${u_d[j].city_name}</td>
+                                <td>${u_d[j].country_name}</td>
+                                <td><button onclick="del_user(${u_d[j].id})" >Delete</button></td>
+                            </tr>`
+                }
+                $("#tbody").html(s2)
+      }
+    })
+  }
+</script>
+
 </body>
 </html>
 
